@@ -1,0 +1,18 @@
+---
+# defaults file for ansible-firefly-iii
+FIREFLY_NETWORK_NAME: fireflyiii
+FIREFLY_DATABASE_NAME: fireflyiii_db
+FIREFLY_DATABASE_PORT: "3306"
+FIREFLY_DATABASE_IMAGE_MARIADB: mariadb:latest
+MYSQL_PASSWORD: # the mysql password of the db server instal
+FIREFLY_INSTANCE_NAME: fireflyiii_app
+FIREFLY_INSTANCE_IMAGE: fireflyiii/core:latest
+FIREFLY_INTANCE_APP_KEY: # you need to enter a 32 character string here
+FIREFLY_APP_PORT: "80"
+MAIL_HOST: localhost
+MAIL_PORT: "25"
+MAIL_FROM: localhost
+MAIL_USERNAME: none
+MAIL_PASSWORD: none
+MAIL_ENCRYPTION: TLS
+FIREFLY_BACKUP_DIR: /home/lucca/backups/firefly

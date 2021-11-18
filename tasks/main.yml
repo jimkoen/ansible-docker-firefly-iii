@@ -1,0 +1,53 @@
+---
+# tasks file for ansible-firefly-iii
+
+
+- name: Include backup tasks
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/backup/backup.yml"
+  when: container_backup_policy == "always" or "once"
+
+- name: Create Docker Network
+  community.docker.docker_network:
+    name: "{{ FIREFLY_NETWORK_NAME }}"
+### FIREFLY III DB
+- name: Create firefly_iii_db container
+  community.docker.docker_container:
+    name: "{{ FIREFLY_DATABASE_NAME }}"
+    image: "{{ FIREFLY_DATABASE_IMAGE_MARIADB }}"
+    networks:
+      - name: "{{ FIREFLY_NETWORK_NAME }}"
+    networks_cli_compatible: no
+    purge_networks: yes
+    env:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: "firefly"
+      MYSQL_PASSWORD: "{{ MYSQL_PASSWORD }}"
+      MYSQL_DATABASE: firefly
+    restart_policy: unless-stopped
+    volumes:
+      - "{{ FIREFLY_DATABASE_NAME }}:/var/lib/mysql"
+
+### FIREFLY III APP
+- name: Create fireflyiiiapp Container
+  community.docker.docker_container:
+    name: "{{ FIREFLY_INSTANCE_NAME }}"
+    image: "{{ FIREFLY_INSTANCE_IMAGE }}"
+    networks:
+      - name: "{{ FIREFLY_NETWORK_NAME }}"
+    networks_cli_compatible: no
+    published_ports: "{{ FIREFLY_APP_PORT }}:8080"
+    exposed_ports: "80:80"
+    env:
+      APP_KEY: "{{ FIREFLY_INTANCE_APP_KEY }}"
+      DB_HOST: "{{ FIREFLY_DATABASE_NAME }}"
+      DB_PORT: "{{ FIREFLY_DATABASE_PORT }}"
+      DB_CONNECTION: mysql
+      DB_DATABASE: firefly
+      DB_USERNAME: firefly
+      DB_PASSWORD: "{{ MYSQL_PASSWORD }}"
+    restart_policy: unless-stopped
+    comparisons:
+      '*': ignore
+    volumes:
+      - "{{ FIREFLY_INSTANCE_NAME }}:/var/www/firefly-iii/storage/export"
+      - "{{ FIREFLY_INSTANCE_NAME }}:/var/www/firefly-iii/storage/upload"

@@ -1,0 +1,16 @@
+---
+  # tasks file to create a backup of a single firefly iii Install
+- name: Ensure that Firefly III Volume exist prior to backup.
+  ansible.builtin.stat:
+    path: "/var/lib/docker/volumes/{{ FIREFLY_INSTANCE_NAME }}"
+  register: stat_result
+
+- name: Backup Firefly III volume.
+  community.docker.docker_container:
+    name: firefly_iii_backup_service
+    image: ubuntu
+    command: tar -czvf /backup/firefly_db.tar /tmp
+    volumes:
+      - "{{ FIREFLY_DATABASE_NAME }}:/tmp"
+      - "{{ FIREFLY_BACKUP_DIR }}:/backup"
+  when: stat_result
