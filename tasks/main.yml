@@ -2,15 +2,15 @@
 # tasks file for ansible-firefly-iii
 
 
-- name: Include backup tasks
-  ansible.builtin.include_tasks: "{{ role_path }}/tasks/backup/backup.yml"
-  when: container_backup_policy == "always" or "once"
+#- name: Include backup tasks
+#  ansible.builtin.include_tasks: "{{ role_path }}/tasks/backup/backup.yml"
+#  when: container_backup_policy == "always" or "once"
 
-- name: Create Docker Network
+- name: Create the FIrefly III Docker network
   community.docker.docker_network:
     name: "{{ FIREFLY_NETWORK_NAME }}"
 ### FIREFLY III DB
-- name: Create firefly_iii_db container
+- name: Create the Firefly III database container.
   community.docker.docker_container:
     name: "{{ FIREFLY_DATABASE_NAME }}"
     image: "{{ FIREFLY_DATABASE_IMAGE_MARIADB }}"
@@ -28,7 +28,7 @@
       - "{{ FIREFLY_DATABASE_NAME }}:/var/lib/mysql"
 
 ### FIREFLY III APP
-- name: Create fireflyiiiapp Container
+- name: Create the Firefly III App Container.
   community.docker.docker_container:
     name: "{{ FIREFLY_INSTANCE_NAME }}"
     image: "{{ FIREFLY_INSTANCE_IMAGE }}"
@@ -51,3 +51,7 @@
     volumes:
       - "{{ FIREFLY_INSTANCE_NAME }}:/var/www/firefly-iii/storage/export"
       - "{{ FIREFLY_INSTANCE_NAME }}:/var/www/firefly-iii/storage/upload"
+
+- name: Include restore tasks.
+  ansible.builtin.include_tasks: "{{ role_path }}/tasks/restore/restore.yml"
+  when: container_backup_policy == "restore"

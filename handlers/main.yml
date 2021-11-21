@@ -1,2 +1,7 @@
 ---
 # handlers file for ansible-firefly-iii
+- name: Restart the Firefly III database container
+  community.docker.docker_container:
+    name: "{{ FIREFLY_DATABASE_NAME }}"
+    state: started
+    restart: yes

@@ -13,4 +13,9 @@
     volumes:
       - "{{ FIREFLY_DATABASE_NAME }}:/tmp"
       - "{{ FIREFLY_BACKUP_DIR }}:/backup"
+  notify:
+    - Restart the Firefly III database container
   when: stat_result
+
+- name: Flush handlers
+  meta: flush_handlers
